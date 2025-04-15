@@ -1,36 +1,19 @@
-import { APIProvider, Map, useMap } from "@vis.gl/react-google-maps";
-import { useEffect } from "react";
-
-const MapView = () => {
-  const map = useMap(); // 👈 obtiene el mapa cargado
-
-  useEffect(() => {
-    if (map) {
-      console.log("🗺️ Map loaded:", map);
-    }
-  }, [map]);
-
-  return (
-    <div style={{ height: "100%", width: "100%" }}>
-      <Map
-        center={{ lat: -29.95332, lng: -71.33947 }}
-        zoom={10}
-        gestureHandling="greedy"
-        disableDefaultUI={false}
-        zoomControl={true}
-        scrollwheel={true}
-        keyboardShortcuts={true}
-        clickableIcons={true}
-        mapTypeId="roadmap"
-      />
-    </div>
-  );
-};
+import { APIProvider, Map } from "@vis.gl/react-google-maps";
 
 const MapComponent = () => {
   return (
     <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
-      <MapView />
+      <Map
+        style={{ height: "100vh", width: "100vw" }}
+
+        zoom={10}
+        gestureHandling="greedy"       
+        scrollwheel={true}             
+        draggable={true}               
+        disableDefaultUI={false}
+        zoomControl={true}
+        mapTypeId="roadmap"
+      />
     </APIProvider>
   );
 };
