@@ -4,14 +4,17 @@ import MapComponent from './components/maps'
 function App() {
   return (
     <div className="app-container">
-      <div >
-        <image src ="/favicon.png" />
-      </div>
-      <MapComponent />
-      <h1 className="app-title">Peruvian Waze</h1>
+      {/* Encabezado con logo + título */}
+      <header className="app-header">
+        <h1 className="app-title">Peruvian Waze</h1>
+        <img src="/favicon.png" alt="Peruvian Waze Logo" className="logo" />
+      </header>
 
+      {/* Mapa */}
+      <main className="map-section">
+        <MapComponent />
+      </main>
     </div>
-
   )
 }
 
