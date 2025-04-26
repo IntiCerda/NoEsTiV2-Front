@@ -2,8 +2,8 @@ html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
-
 
 .app-container {
   position: relative;
@@ -11,13 +11,30 @@ html, body, #root {
   height: 100vh;
 }
 
-.app-title {
+.app-header {
   position: absolute;
   top: 20px;
   left: 20px;
   z-index: 10;
-  font-size: 2.5rem;
+  display: flex;
+  flex-direction: column; 
+  align-items: center; 
+  background-color: rgb(25, 23, 23);
+  padding: 16px 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.logo {
+  width: 130px; /* Ajusta el tamaño de la imagen */
+  height: auto;
+  margin-top: 20px; /* Espaciado entre el título y la imagen */
+}
+
+.app-title {
+  font-size: 1.8rem;
   color: white;
-  text-shadow: 0 0 10px black;
-  pointer-events: none; 
+  margin: 0;
+  text-shadow: 0 0 6px black;
+  pointer-events: none;
 }
