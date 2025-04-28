@@ -3,7 +3,7 @@ import { APIProvider, Map, InfoWindow, AdvancedMarker } from "@vis.gl/react-goog
 import Sidebar from "./Sidebar";
 import MapController from "./MapController";
 
-
+import { fetchData } from "../../services/archivo";
 
 const getColorByCategory = (category) => {
   switch (category) {
@@ -30,7 +30,7 @@ const CategoryMarker = ({ color }) => (
   }} />
 );
 
-const MapComponent = ({ data, setData }) => {
+const MapComponent = ({ data, setData, onDataChange }) => {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -44,9 +44,16 @@ const MapComponent = ({ data, setData }) => {
   const geocoderRef = useRef(null);
   const [directionsError, setDirectionsError] = useState(null);
 
+
+
   useEffect(() => {
-    if (!apiKey) setError("API Key no encontrada");
+    if (!apiKey) {
+      setError("API Key no encontrada");
+    } else {
+      fetchData(); 
+    }
   }, [apiKey]);
+  
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1500);
@@ -136,7 +143,15 @@ const MapComponent = ({ data, setData }) => {
   }, [map]);
 
   const sendMarkerToBackend = async (position, markerData) => {
-    const response = await fetch(import.meta.env.VITE_GRAPHQL_URL, {
+    const graphqlUrl = import.meta.env.VITE_BACKEND_URL;
+    if (!graphqlUrl) {
+      console.error("URL de GraphQL no definida");
+      throw new Error("URL de GraphQL no definida en las variables de entorno");
+    }
+    
+    console.log("Enviando a:", graphqlUrl); 
+    
+    const response = await fetch(graphqlUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -162,15 +177,15 @@ const MapComponent = ({ data, setData }) => {
         }
       })
     });
-
+    
     const result = await response.json();
+    console.log("Resultado de la mutación:", result);
 
     if (result.errors) {
       throw new Error(result.errors[0].message);
     }
-
-    const newLocation = result.data.createLocation;
-    setData((prevData) => [...prevData, newLocation]);
+  
+    return result.data.createLocation;
   };
 
   const mapOptions = {
@@ -331,9 +346,18 @@ const MapComponent = ({ data, setData }) => {
                     }
                     setSubmitting(true);
                     try {
+                      const categoryToKeep = newMarkerData.category;
+                      
                       await sendMarkerToBackend(newMarkerPosition, newMarkerData);
+                      
                       setNewMarkerPosition(null);
-                      setNewMarkerData({ title: "", comment: "", category: "peligro" });
+                      setNewMarkerData({ title: "", comment: "", category: categoryToKeep });
+                      
+                      await fetchData();
+                      
+                      if (onDataChange) {
+                        onDataChange();
+                      }
                     } catch (error) {
                       console.error("Error al enviar el marcador", error);
                       alert("Hubo un error. Intenta de nuevo.");
