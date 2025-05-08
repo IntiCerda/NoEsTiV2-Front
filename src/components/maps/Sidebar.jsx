@@ -178,7 +178,7 @@ const Sidebar = ({ onSearch, onDirections }) => {
           </form>
         ) : (
           <form onSubmit={handleDirections}>
-            <div style={{ marginBottom: "10px", marginRight: "1rem" }}>
+            <div style={{ marginBottom: "15px", marginRight: "1rem" }}>
               <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold", color: "white" }}>
                 Origen:
               </label>

@@ -29,6 +29,18 @@ const CategoryMarker = ({ color }) => (
   }} />
 );
 
+const UserLocationMarker = () => (
+  <div style={{
+    width: "14px",
+    height: "14px",
+    backgroundColor: "#00c853",
+    borderRadius: "50%",
+    border: "2px solid white",
+    boxShadow: "0 0 3px rgba(0,0,0,0.5)",
+    transform: "translate(-50%, -100%)"
+  }} />
+);
+
 const MapComponent = ({ data, setData, onDataChange }) => {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const [error, setError] = useState(null);
@@ -43,6 +55,7 @@ const MapComponent = ({ data, setData, onDataChange }) => {
   const geocoderRef = useRef(null);
   const [directionsError, setDirectionsError] = useState(null);
   const [initialCenter, setInitialCenter] = useState({ lat: -29.95332, lng: -71.33947 });
+  const [userPosition, setUserPosition] = useState(null);
   const [locating, setLocating] = useState(true);
 
   useEffect(() => {
@@ -50,22 +63,28 @@ const MapComponent = ({ data, setData, onDataChange }) => {
       setLocating(true);
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setInitialCenter({ lat: position.coords.latitude, lng: position.coords.longitude });
+          const currentPos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setInitialCenter(currentPos);
+          setUserPosition(currentPos);
           setLocating(false);
         },
         (err) => {
           console.warn(`Error de geolocalización (${err.code}): ${err.message}`);
+          alert(`Error de geolocalización (${err.code}): ${err.message}`);
           setLocating(false);
         },
         {
           enableHighAccuracy: true,
-          timeout: 10000,
+          timeout: 20000,
           maximumAge: 0,
         }
       );
-      
     } else {
       console.warn("La geolocalización no está soportada por este navegador");
+      alert("La geolocalización no está soportada por este navegador.");
       setLocating(false);
     }
   }, []);
@@ -190,13 +209,14 @@ const MapComponent = ({ data, setData, onDataChange }) => {
           };
           map.setCenter(currentPos);
           map.setZoom(17);
+          setUserPosition(currentPos);
           setLocating(false);
         },
         (err) => {
           alert("No se pudo obtener la ubicación.");
           setLocating(false);
         },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
       );
     }
   }, [map]);
@@ -232,6 +252,12 @@ const MapComponent = ({ data, setData, onDataChange }) => {
               <CategoryMarker color={getColorByCategory(loc.category)} />
             </AdvancedMarker>
           ))}
+
+          {userPosition && (
+            <AdvancedMarker position={userPosition}>
+              <UserLocationMarker />
+            </AdvancedMarker>
+          )}
 
           {selectedPlace && (
             <InfoWindow position={selectedPlace.position} onCloseClick={() => setSelectedPlace(null)}>
